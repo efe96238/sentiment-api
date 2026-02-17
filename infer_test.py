@@ -21,13 +21,18 @@ X = vectorizer.transform(texts).toarray()
 X = torch.tensor(X, dtype=torch.float32).to(device)
 
 def infere(model, X):
+  label_map = {0: "negative", 1: "positive"}
   model.eval()
   with torch.inference_mode():
     logits = model(X)
-    probs = torch.softmax(logits, dim=1)
+    probs = torch.softmax(logits, dim=1) #because I used CrossEntropyLoss
     pred = probs.argmax(dim=1)
     print(pred)
-    print(probs)
+    print(probs) #can be interpreted as "confidence"
+
+    #for better output
+    for p in pred:
+      print(label_map[p.item()])
 
 if __name__ == "__main__":
   infere(loaded_model, X)
