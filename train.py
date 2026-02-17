@@ -2,6 +2,7 @@ import torch
 from torch import nn
 import pandas as pd
 import numpy as np
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -16,8 +17,8 @@ df['label'] = df['label'].astype(int)
 X_train_text, X_val_text, y_train, y_val = train_test_split(df["text"], df["label"], test_size=0.2, shuffle=True, random_state=42)
 
 vectorizer = CountVectorizer()
-X_train_vec = vectorizer.fit_transform(X_train_text).toarray()
-X_val_vec = vectorizer.transform(X_val_text).toarray()
+X_train_vec = vectorizer.fit_transform(X_train_text).toarray() # learns vocab from text, builds word to index mapping, converts texts to vectors
+X_val_vec = vectorizer.transform(X_val_text).toarray() # uses already learned vocab, converts text to vectors, does not change vocab
 
 vocab_size = len(vectorizer.vocabulary_)
 
@@ -57,3 +58,5 @@ def train(model, epochs:int):
 if __name__ == "__main__":
   train(model=model, epochs=100)
   torch.save(model.state_dict(), "models/SentimentAPI.pth")
+  with open("models/vocab.json", "w", encoding="utf-8") as f:
+    json.dump(vectorizer.vocabulary_, f)
